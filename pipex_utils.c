@@ -19,11 +19,15 @@ void free_everything(char **str)
 
 void free_list(t_list **lst)
 {
-	free((*lst)->path);
-	free((*lst)->cmd1);
+	if ((*lst)->path)
+		free((*lst)->path);
+	if ((*lst)->cmd1)
+		free((*lst)->cmd1);
 	free((*lst)->cmd2);
-	free_everything((*lst)->args1);
-	free_everything((*lst)->args2);
+	if (*(*lst)->args1)
+		free_everything((*lst)->args1);
+	if (*(*lst)->args2)
+		free_everything((*lst)->args2);
 	free(*lst);
 }
 
@@ -52,16 +56,13 @@ char *find_path(char **envp, char *cmd)
 	if (!envp[i])
 		return NULL;
 	path = ft_strdup(&envp[i][5]);
-	if (ft_strchr(path, ':'))
-		pathes = ft_split(path, ':');
-	else
-		pathes = ft_strstrdup(path);
+	pathes = ft_split(path, ':');
 	free(path);
 	path = ft_strjoin((const char *)pathes[j], cmd);
-	while (access(path, F_OK) < 0 && pathes[j++] && free_and_continue(path))
+	while (pathes[j++] && access(path, F_OK) < 0  && free_and_continue(path))
 		path = ft_strjoin((const char *)pathes[j], cmd);
 	free(path);
-	path = ft_strdup(pathes[j]);
+	path = ft_strdup(pathes[--j]);
 	return (free_everything(pathes), path);
 }
 
