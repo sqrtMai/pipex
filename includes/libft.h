@@ -20,11 +20,18 @@
 
 typedef struct s_list
 {
-	void			*content;
+	char			*cmd1;
+	char			*cmd2;
+	char			**args1;
+	char			**args2;
+	char			*path;
+	char			*slash;
+	int				infile;
+	int				outfile;
 	struct s_list	*next;
 }	t_list;
 
-t_list	*ft_lstnew(void *content);
+t_list	*ft_lstnew(char *argv2, char *argv3, char *infile, char *outfile);
 t_list	*ft_lstlast(t_list *lst);
 t_list	*ft_lstmap(t_list *lst, void *(*f)(void *), void (*del)(void *));
 
@@ -55,6 +62,7 @@ void	ft_lstadd_back(t_list **lst, t_list *new);
 void	ft_lstdelone(t_list *lst, void (*del)(void *));
 void	ft_lstclear(t_list **lst, void (*del)(void *));
 void	ft_lstiter(t_list *lst, void (*f)(void *));
+void	free_everything(char **str);
 
 int		ft_isalpha(int c);
 int		ft_isdigit(int c);

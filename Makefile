@@ -4,7 +4,7 @@ CFLAGS = -Wall -Wextra -Werror -I./includes/
 AR = ar rcs
 RM = rm -f
 
-SRC = pipex.c
+SRC = pipex.c pipex_utils.c
 OBJ = $(SRC:.c=.o)
 
 LIBFT_DIR = libft
