@@ -3,40 +3,78 @@
 /*                                                        :::      ::::::::   */
 /*   ft_lstnew_px.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mai <mai@student.42.fr>                    +#+  +:+       +#+        */
+/*   By: bbouarab <bbouarab@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/07 08:23:46 by bbouarab          #+#    #+#             */
-/*   Updated: 2025/11/30 16:44:58 by mai              ###   ########.fr       */
+/*   Updated: 2025/12/01 13:56:53 by bbouarab         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "includes/pipex.h"
 
-t_list	*ft_lstnew_px(char *argv2, char *argv3, char *infile, char *outfile, char **envp)
+t_list *init_nodes()
 {
 	t_list	*new_list;
-	if (!argv2[0] || !argv3[0])
-		exit(1);
+
 	new_list = malloc(sizeof(t_list));
 	if (!new_list)
-		exit(1);
+		return (NULL);
+
+	new_list->cmd = NULL;
+	new_list->args = NULL;
+	new_list->path = NULL;
 	new_list->slash = "/";
-	new_list->args1 = ft_split(argv2, ' ');
-	if (!(*new_list->args1))
-		return free(new_list->args1), free(new_list), NULL;
-	new_list->cmd1 = ft_strjoin(new_list->slash, new_list->args1[0]);
-	new_list->args2 = ft_split(argv3, ' ');
-	if (!(*new_list->args2))
-		return (free(new_list->cmd1), free_everything(new_list->args1), free(new_list->args2), free(new_list), NULL);
-	new_list->cmd2 = ft_strjoin(new_list->slash, new_list->args2[0]);
-
-
-
-	new_list->path = find_path(envp, new_list->cmd1);
-	if (!new_list->path ||check_cmd(new_list->path, new_list->cmd2))
-		return (ft_printf("No command has been found"), free_list(&new_list), NULL);
-	new_list->infile = open(infile, O_RDONLY);
-	new_list->outfile = open(outfile, O_WRONLY | O_TRUNC | O_CREAT);
+	new_list->infile = 0;
+	new_list->outfile = 0;
+	new_list->absolute = 0;
 	new_list->next = NULL;
-	return (new_list);
+	new_list->previous = NULL;
+	return new_list;
+}
+
+void init_cmd1(t_list *lst, char *infile, char *cmd1, char *outfile, char **envp)
+{
+	if (!cmd1[0])
+		return (free_list(&lst), exit(1));
+	lst->args = ft_split(cmd1, ' ');
+	if (!lst->args)
+		return (free_list(&lst), exit(1));
+	if (!strchr(lst->args[0], '/'))
+		lst->cmd = ft_strjoin(lst->slash, lst->args[0]);
+	else
+		lst->cmd = lst->args[lst->absolute++];
+	if (!lst->absolute)
+		lst->path = find_path(envp, lst->cmd);
+	lst->infile = open(infile, O_RDONLY);
+	lst->outfile = open(outfile, O_RDWR | O_CREAT, 777, O_TRUNC);
+	if (lst->infile < 0 || lst->outfile < 0)
+		return (free_list(&lst), perror("open"), exit(1));
+}
+
+void init_cmd2(t_list *lst, char *cmd2, char **envp)
+{
+	if (!cmd2[0])
+		return (free_list(&lst->previous), exit(1));
+	lst->args = ft_split(cmd2, ' ');
+	if (!lst->args)
+		return (free_list(&lst->previous), exit(1));
+	if (!strchr(lst->args[0], '/'))
+		lst->cmd = ft_strjoin(lst->slash, lst->args[0]);
+	else
+		lst->cmd = lst->args[lst->absolute++];
+	if (!lst->absolute)
+		lst->path = find_path(envp, lst->cmd);
+}
+
+void init_list(t_list **lst, char **argv, char **envp)
+{
+	*lst = init_nodes();
+	if (!*lst)
+		exit(1);
+	(*lst)->next = init_nodes();
+	if ((!(*lst)->next))
+		return (free(*lst), exit(1));
+	(*lst)->next->previous = (*lst);
+	init_cmd1(*lst, argv[1], argv[2], argv[4], envp);
+	init_cmd2((*lst)->next, argv[3], envp);
 }

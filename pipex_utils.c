@@ -19,16 +19,27 @@ void free_everything(char **str)
 
 void free_list(t_list **lst)
 {
-	if ((*lst)->path)
-		free((*lst)->path);
-	if ((*lst)->cmd1)
-		free((*lst)->cmd1);
-	free((*lst)->cmd2);
-	if (*(*lst)->args1)
-		free_everything((*lst)->args1);
-	if (*(*lst)->args2)
-		free_everything((*lst)->args2);
-	free(*lst);
+	t_list *temp;
+	t_list *temp_next;
+
+	temp = *lst;
+	temp_next = (*lst)->next;
+	// if (temp->infile >= 0)
+	// 	close(temp->infile);
+	// if (temp->outfile >= 0)
+	// 	close(temp->outfile);
+	while (temp)
+	{
+		if(temp->path && !temp->absolute)
+			free(temp->path);
+		if (temp->cmd && !temp->absolute)
+			free(temp->cmd);
+		if (temp->args)
+			free_everything(temp->args);
+		temp = temp->next;
+		free(*lst);
+		*lst = temp;
+	}
 }
 
 char **ft_strstrdup(char *str)
