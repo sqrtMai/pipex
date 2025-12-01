@@ -22,8 +22,8 @@ typedef struct s_list
 
 char **ft_strstrdup(char *str);
 char *find_path(char **envp, char *cmd);
-void free_list(t_list **lst);
+void free_list(t_list **lst, int i);
 void init_list(t_list **lst, char **argv, char **envp);
-int check_cmd(char *path, char *cmd, int i);
+int check_cmd(char *full_path);
 void	free_everything(char **str);
 #endif

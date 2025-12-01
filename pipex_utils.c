@@ -17,18 +17,12 @@ void free_everything(char **str)
 		free(str);
 }
 
-void free_list(t_list **lst)
+void free_list(t_list **lst, int i)
 {
 	t_list *temp;
-	t_list *temp_next;
 
 	temp = *lst;
-	temp_next = (*lst)->next;
-	// if (temp->infile >= 0)
-	// 	close(temp->infile);
-	// if (temp->outfile >= 0)
-	// 	close(temp->outfile);
-	while (temp)
+	while (temp && i)
 	{
 		if(temp->path && !temp->absolute)
 			free(temp->path);
@@ -39,6 +33,7 @@ void free_list(t_list **lst)
 		temp = temp->next;
 		free(*lst);
 		*lst = temp;
+		i--;
 	}
 }
 
