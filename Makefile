@@ -1,6 +1,6 @@
 NAME = pipex
 CC = cc
-CFLAGS = -Wall -Wextra -Werror -I./includes/
+CFLAGS = -Wall -Wextra -Werror -I./
 AR = ar rcs
 RM = rm -f
 

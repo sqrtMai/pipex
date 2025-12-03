@@ -9,8 +9,8 @@ void main_process(int fd, t_list *lst, char **envp)
 		full_path = ft_strjoin(lst->next->path, lst->next->cmd);
 		if (check_cmd(full_path))
 		{
-			ft_printf("command not found: %s\n", lst->next->cmd);
-			return (free_list(&lst, 2), exit(1));
+			ft_printf("command not found: %s\n", lst->next->args[0]);
+			return (free_list(&lst, 2), exit(127));
 		}
 	}
 	else
@@ -19,7 +19,7 @@ void main_process(int fd, t_list *lst, char **envp)
 		if (check_cmd(full_path))
 		{
 			ft_printf("No such file or directory: %s\n", full_path);
-			return (free_list(&lst, 2), exit(1));
+			return (free_list(&lst, 2), exit(127));
 		}
 	}
 	dup2(lst->outfile, 1);
@@ -37,8 +37,8 @@ void child_process(int fd, t_list *lst, char **envp)
 		full_path = ft_strjoin(lst->path, lst->cmd);
 		if (check_cmd(full_path))
 		{
-			ft_printf("command not found: %s\n", lst->cmd);
-			return (free_list(&lst, 2), exit(1));
+			ft_printf("command not found: %s\n", lst->args[0]);
+			return (free_list(&lst, 2), exit(127));
 		}
 	}
 	else
@@ -47,18 +47,15 @@ void child_process(int fd, t_list *lst, char **envp)
 		if (check_cmd(full_path))
 		{
 			ft_printf("No such file or directory: %s\n", full_path);
-			return (free_list(&lst, 2), exit(1));
+			return (free_list(&lst, 2), exit(127));
 		}
 	}
 	dup2(lst->infile, 0);
 	dup2(fd, 1);
 	if (execve(full_path, lst->args, envp) < 0)
-	{
-		free_list(&lst, 2);
-		exit(1);
-	}
-
+		return (free_list(&lst, 2), exit(1));
 }
+
 int check_cmd(char *full_path)
 {
 	if (!full_path)
@@ -90,5 +87,5 @@ int main(int argc, char **argv, char **envp)
 	if (id2 == 0)
 		return (main_process(fd[0], lst, envp), 0);
 	else
-		return (waitpid(id, NULL, 0), waitpid(id2, NULL, 0), close(fd[0]), free_list(&lst, 2), 0);
+		return (waitpid(id, NULL, 0), waitpid(id2, NULL, 0), close(fd[0]), free_list(&lst, 2), 2);
 }

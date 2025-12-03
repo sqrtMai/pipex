@@ -55,6 +55,8 @@ char *find_path(char **envp, char *cmd)
 	int j;
 	int i;
 
+	if (!cmd)
+		return NULL;
 	i = 0;
 	j = 0;
 	while (!ft_strnstr(envp[i], "PATH", 4) && envp[i])
