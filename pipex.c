@@ -61,7 +61,6 @@ void child_process(int fd, t_list *lst, char **envp)
 }
 int check_cmd(char *full_path)
 {
-
 	if (!full_path)
 		return 1;
 	if (access(full_path, X_OK) < 0)
