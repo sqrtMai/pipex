@@ -18,7 +18,7 @@ char	*ft_strchr(const char *string, int searchedChar )
 
 	i = 0;
 	if (!string)
-		return NULL;
+		return (NULL);
 	while (string[i])
 	{
 		if (string[i] == ((char)searchedChar))
