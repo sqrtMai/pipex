@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   list_related.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bbouarab <bbouarab@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mai <mai@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/07 08:23:46 by bbouarab          #+#    #+#             */
-/*   Updated: 2025/12/04 16:28:26 by bbouarab         ###   ########.fr       */
+/*   Updated: 2025/12/07 13:38:52 by mai              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,6 @@ t_list	*init_nodes(void)
 	new_list->outfile = 100;
 	new_list->absolute = 0;
 	new_list->next = NULL;
-	new_list->previous = NULL;
 	return (new_list);
 }
 
@@ -46,36 +45,55 @@ void	init_files(t_list *lst, char *infile, char *outfile)
 			ft_printf("%s: no such file or directory\n", infile), exit(127));
 }
 
-void	init_cmd1(t_list *lst, char *cmd1, char **envp)
+void create_list(t_list **lst, int cmd_total)
 {
-	lst->args = ft_split(cmd1, ' ');
-	if (!ft_strchr(lst->args[0], '/'))
-		lst->cmd = ft_strjoin(lst->slash, lst->args[0]);
-	else
-		lst->cmd = lst->args[lst->absolute++];
-	if (!lst->absolute)
-		lst->path = find_path(envp, lst->cmd);
-}
-
-void	init_cmd2(t_list *lst, char *cmd2, char **envp)
-{
-	lst->args = ft_split(cmd2, ' ');
-	if (!ft_strchr(lst->args[0], '/'))
-		lst->cmd = ft_strjoin(lst->slash, lst->args[0]);
-	else
-		lst->cmd = lst->args[lst->absolute++];
-	if (!lst->absolute)
-		lst->path = find_path(envp, lst->cmd);
-}
-
-void	init_list(t_list **lst, char **argv, char **envp)
-{
+	t_list *head_ptr;
+	int i;
 	*lst = init_nodes();
-	(*lst)->next = init_nodes();
-	(*lst)->next->previous = *lst;
-	if ((!(*lst)->next))
-		return (free_list(lst, 2), exit(1));
-	init_cmd1(*lst, argv[2], envp);
-	init_files(*lst, argv[1], argv[4]);
-	init_cmd2((*lst)->next, argv[3], envp);
+	head_ptr = *lst;
+	i = 1;
+	while (i < cmd_total)
+	{
+		(*lst)->next = init_nodes();
+		*lst = (*lst)->next;
+		i++;
+	}
+	*lst = head_ptr;
+}
+size_t argvlen(char **argv)
+{
+	size_t size_of_argv;
+
+	size_of_argv = 0;
+	while (argv[size_of_argv])
+		size_of_argv++;
+	return (size_of_argv);
+}
+void init_cmd(t_list *lst, char **argv, char **envp)
+{
+	int current_cmd;
+	size_t size_of_argv;
+
+	current_cmd = 2;
+	size_of_argv = argvlen(argv);
+	while (lst)
+	{
+		lst->args = ft_split(argv[current_cmd], ' ');
+		if (!ft_strchr(lst->args[0], '/'))
+			lst->cmd = ft_strjoin(lst->slash, lst->args[0]);
+		else
+			lst->cmd = lst->args[lst->absolute++];
+		if (!lst->absolute)
+			lst->path = find_path(envp, lst->cmd);
+		if (current_cmd == 2)
+			init_files(lst, argv[1], argv[size_of_argv - 1]);
+		current_cmd++;
+		lst = lst->next;
+	}
+}
+
+void	init_list(t_list **lst, char **argv, char **envp, int cmd_total)
+{
+	create_list(lst, cmd_total);
+	init_cmd(*lst, argv, envp);
 }

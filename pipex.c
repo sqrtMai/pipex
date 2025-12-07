@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   pipex.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bbouarab <bbouarab@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mai <mai@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/04 16:16:53 by bbouarab          #+#    #+#             */
-/*   Updated: 2025/12/04 16:27:42 by bbouarab         ###   ########.fr       */
+/*   Updated: 2025/12/07 12:16:14 by mai              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -89,7 +89,7 @@ int	main(int argc, char **argv, char **envp)
 	if (argc != 5)
 		return (1);
 	lst = NULL;
-	init_list(&lst, argv, envp);
+	init_list(&lst, argv, envp, argc - 3);
 	pipe(fd);
 	id = fork();
 	if (id != 0)
