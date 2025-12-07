@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   pipex_utils.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bbouarab <bbouarab@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mai <mai@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/04 16:17:01 by bbouarab          #+#    #+#             */
-/*   Updated: 2025/12/04 16:28:36 by bbouarab         ###   ########.fr       */
+/*   Updated: 2025/12/07 17:20:43 by mai              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,30 +18,34 @@ int	free_and_continue(char *s)
 	return (1);
 }
 
-void	free_everything(char **str)
+void	free_everything(void **vector)
 {
 	int	i;
 
 	i = 0;
-	while (str[i])
-		free(str[i++]);
-	if (str)
-		free(str);
+	while (vector[i])
+		free(vector[i++]);
+	if (vector)
+		free(vector);
 }
 
-void	free_list(t_list **lst, int i)
+void	free_list(t_list **lst)
 {
 	t_list	*temp;
 
+	while ((*lst)->previous)
+		*lst = (*lst)->previous;
+
 	temp = *lst;
-	while (temp && i)
+	//printf("%p\n", temp->next);
+	while (temp)
 	{
 		if (temp->path && !temp->absolute)
 			free(temp->path);
 		if (temp->cmd && !temp->absolute)
 			free(temp->cmd);
 		if (temp->args)
-			free_everything(temp->args);
+			free_everything(((void **)temp->args));
 		if ((*lst)->infile)
 			close((*lst)->infile);
 		if ((*lst)->outfile)
@@ -49,7 +53,6 @@ void	free_list(t_list **lst, int i)
 		temp = temp->next;
 		free(*lst);
 		*lst = temp;
-		i--;
 	}
 }
 
@@ -86,5 +89,5 @@ char	*find_path(char **envp, char *cmd)
 		path = ft_strjoin((const char *)pathes[j], cmd);
 	free(path);
 	path = ft_strdup(pathes[--j]);
-	return (free_everything(pathes), path);
+	return (free_everything(((void **)pathes)), path);
 }

@@ -6,66 +6,77 @@
 /*   By: mai <mai@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/04 16:16:53 by bbouarab          #+#    #+#             */
-/*   Updated: 2025/12/07 12:16:14 by mai              ###   ########.fr       */
+/*   Updated: 2025/12/07 17:43:30 by mai              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "includes/pipex.h"
 
-void	main_process(int fd, t_list *lst, char **envp, char **argv)
+int **malloc_fds(int total_args)
 {
-	char	*full_path;
+	int **fds;
+	int i = 0;
 
-	if (lst->next->absolute == 0)
+	fds = malloc((total_args - 1) * sizeof(int *));
+	while (i <= total_args - 2)
 	{
-		full_path = ft_strjoin(lst->next->path, lst->next->cmd);
-		if (check_cmd(full_path))
-		{
-			command_not_found(lst->next->args[0], argv[3]);
-			return (close(fd), free_list(&lst, 2), exit(127));
-		}
+		fds[i] = malloc(2 * sizeof(int));
+		i++;
 	}
-	else
-	{
-		full_path = lst->next->cmd;
-		if (check_cmd(full_path))
-		{
-			file_or_directory(full_path, argv[3]);
-			return (close(fd), free_list(&lst, 2), exit(127));
-		}
-	}
-	dup2(lst->outfile, 1);
-	dup2(fd, 0);
-	if (execve(full_path, lst->next->args, envp) < 0)
-		return (close(fd), free_list(&lst, 2), exit(1));
+	return fds;
 }
 
-void	child_process(int fd, t_list *lst, char **envp, char **argv)
+void open_pipes(int **fds, int total_args)
 {
-	char	*full_path;
+	int i = 0;
+	while (i <= total_args - 2)
+	{
+		pipe(fds[i]);
+		i++;
+	}
+}
+void close_all_pipes(int **fds, int total_args)
+{
+	int i = 0;
+	int j;
+	while (i <= total_args - 2)
+	{
+		j = 0;
+		while (j < 2)
+		{
+			close(fds[i][j]);
+			j++;
+		}
+		i++;
+	}
+}
+int create_process(int **fds, t_list *lst, char **argv, char **envp)
+{
+	int status;
+	int current_process;
+	t_list *first;
 
-	if (lst->absolute == 0)
+	status = 0;
+	current_process = lst->index - 2;
+	first = lst;
+	while (lst)
 	{
-		full_path = ft_strjoin(lst->path, lst->cmd);
-		if (check_cmd(full_path))
+		lst->pid = fork();
+		if (lst->pid == 0)
 		{
-			command_not_found(lst->args[0], argv[2]);
-			return (close(fd), free_list(&lst, 2), exit(127));
+			tree_of_closing(fds, current_process, lst->total_args);
+			tree_of_process(fds, lst, argv, envp);
 		}
+		lst = lst->next;
+		current_process++;
 	}
-	else
+	close_all_pipes(fds, first->total_args);
+	while (first)
 	{
-		full_path = lst->cmd;
-		if (check_cmd(full_path))
-		{
-			file_or_directory(full_path, argv[2]);
-			return (close(fd), free_list(&lst, 2), exit(127));
-		}
+		waitpid(first->pid, &status, 1);
+		first = first->next;
 	}
-	dup2(lst->infile, 0);
-	dup2(fd, 1);
-	if (execve(full_path, lst->args, envp) < 0)
-		return (free_list(&lst, 2), exit(1));
+	return status;
 }
 
 int	check_cmd(char *full_path)
@@ -78,28 +89,34 @@ int	check_cmd(char *full_path)
 		return (0);
 }
 
+void free_fd(int **fds, int total_args)
+{
+	int	i;
+
+	i = 0;
+	while (i <= total_args - 2)
+		free(fds[i++]);
+	if (fds)
+		free(fds);
+}
+
 int	main(int argc, char **argv, char **envp)
 {
-	int		fd[2];
-	int		status;
-	pid_t	id;
-	pid_t	id2;
+
+	int total_args;
+	int **fds;
+	int status;
 	t_list	*lst;
 
-	if (argc != 5)
+
+	if (argc < 5)
 		return (1);
 	lst = NULL;
-	init_list(&lst, argv, envp, argc - 3);
-	pipe(fd);
-	id = fork();
-	if (id != 0)
-		id2 = fork();
-	if (id == 0)
-		return (close(fd[0]), child_process(fd[1], lst, envp, argv), 0);
-	close(fd[1]);
-	if (id2 == 0)
-		return (main_process(fd[0], lst, envp, argv), 0);
-	else
-		return (waitpid(id, &status, 0), waitpid(id2, &status, 0), close(fd[0]),
-			free_list(&lst, 2), WEXITSTATUS(status));
+	total_args = argc - 3;
+	fds = malloc_fds(total_args);
+	init_list(&lst, argv, envp, total_args);
+	open_pipes(fds, total_args);
+	status = create_process(fds, lst, argv, envp);
+	free_fd(fds, total_args);
+	return (free_list(&lst), WEXITSTATUS(status));
 }

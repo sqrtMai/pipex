@@ -6,13 +6,13 @@
 /*   By: mai <mai@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/07 08:23:46 by bbouarab          #+#    #+#             */
-/*   Updated: 2025/12/07 13:38:52 by mai              ###   ########.fr       */
+/*   Updated: 2025/12/07 17:13:55 by mai              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "includes/pipex.h"
 
-t_list	*init_nodes(void)
+t_list	*init_nodes(int total_args)
 {
 	t_list	*new_list;
 
@@ -26,40 +26,59 @@ t_list	*init_nodes(void)
 	new_list->infile = 100;
 	new_list->outfile = 100;
 	new_list->absolute = 0;
+	new_list->index = 2;
+	new_list->total_args = total_args;
 	new_list->next = NULL;
+	new_list->previous = NULL;
 	return (new_list);
 }
 
-void	init_files(t_list *lst, char *infile, char *outfile)
+void	init_infile(t_list *lst, char *infile)
 {
 	lst->infile = open(infile, O_RDONLY);
-	lst->outfile = open(outfile, O_WRONLY | O_TRUNC | O_CREAT, 0644);
+
 	if ((access(infile, R_OK) < 0 && access(infile, F_OK) == 0))
-		return (free_list(&lst, 2),
+		return (free_list(&lst),
 			ft_printf("%s: Permission denied\n", infile), exit(1));
-	if (access(outfile, W_OK) < 0 && access(outfile, F_OK) == 0)
-		return (free_list(&lst, 2),
-			ft_printf("%s: Permission denied\n", outfile), exit(1));
-	if (lst->infile < 0 || lst->outfile < 0)
-		return (free_list(&lst, 2),
+	if (lst->infile < 0)
+		return (free_list(&lst),
 			ft_printf("%s: no such file or directory\n", infile), exit(127));
+}
+
+void	init_outfile(t_list *lst, char *outfile)
+{
+	lst->outfile = open(outfile, O_WRONLY | O_TRUNC | O_CREAT, 0644);
+	if (access(outfile, W_OK) < 0 && access(outfile, F_OK) == 0)
+		return (free_list(&lst),
+			ft_printf("%s: Permission denied\n", outfile), exit(1));
+	if (lst->outfile < 0)
+		return (free_list(&lst),
+			ft_printf("%s: a problem has occured with opening outfile\n", outfile), exit(127));
 }
 
 void create_list(t_list **lst, int cmd_total)
 {
 	t_list *head_ptr;
+	t_list *previous;
 	int i;
-	*lst = init_nodes();
+
+	*lst = init_nodes(cmd_total);
 	head_ptr = *lst;
 	i = 1;
 	while (i < cmd_total)
 	{
-		(*lst)->next = init_nodes();
+		(*lst)->next = init_nodes(cmd_total);
+		if (i == 1)
+			previous = *lst;
 		*lst = (*lst)->next;
+		//previous->next = (*lst);
+		(*lst)->previous = previous;
+		previous = previous->next;
 		i++;
 	}
 	*lst = head_ptr;
 }
+
 size_t argvlen(char **argv)
 {
 	size_t size_of_argv;
@@ -69,13 +88,13 @@ size_t argvlen(char **argv)
 		size_of_argv++;
 	return (size_of_argv);
 }
+
 void init_cmd(t_list *lst, char **argv, char **envp)
 {
 	int current_cmd;
-	size_t size_of_argv;
+	t_list *last;
 
 	current_cmd = 2;
-	size_of_argv = argvlen(argv);
 	while (lst)
 	{
 		lst->args = ft_split(argv[current_cmd], ' ');
@@ -85,11 +104,15 @@ void init_cmd(t_list *lst, char **argv, char **envp)
 			lst->cmd = lst->args[lst->absolute++];
 		if (!lst->absolute)
 			lst->path = find_path(envp, lst->cmd);
+		lst->index = current_cmd;
 		if (current_cmd == 2)
-			init_files(lst, argv[1], argv[size_of_argv - 1]);
+			init_infile(lst, argv[1]);
 		current_cmd++;
+		if (!lst->next)
+			last = lst;
 		lst = lst->next;
 	}
+	init_outfile(last, argv[argvlen(argv)- 1]);
 }
 
 void	init_list(t_list **lst, char **argv, char **envp, int cmd_total)
