@@ -3,57 +3,23 @@
 /*                                                        :::      ::::::::   */
 /*   pipex_utils.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mai <mai@student.42.fr>                    +#+  +:+       +#+        */
+/*   By: bbouarab <bbouarab@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/04 16:17:01 by bbouarab          #+#    #+#             */
-/*   Updated: 2025/12/07 17:20:43 by mai              ###   ########.fr       */
+/*   Updated: 2025/12/08 15:27:27 by bbouarab         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "includes/pipex.h"
 
-int	free_and_continue(char *s)
+size_t argvlen(char **argv)
 {
-	free(s);
-	return (1);
-}
+	size_t size_of_argv;
 
-void	free_everything(void **vector)
-{
-	int	i;
-
-	i = 0;
-	while (vector[i])
-		free(vector[i++]);
-	if (vector)
-		free(vector);
-}
-
-void	free_list(t_list **lst)
-{
-	t_list	*temp;
-
-	while ((*lst)->previous)
-		*lst = (*lst)->previous;
-
-	temp = *lst;
-	//printf("%p\n", temp->next);
-	while (temp)
-	{
-		if (temp->path && !temp->absolute)
-			free(temp->path);
-		if (temp->cmd && !temp->absolute)
-			free(temp->cmd);
-		if (temp->args)
-			free_everything(((void **)temp->args));
-		if ((*lst)->infile)
-			close((*lst)->infile);
-		if ((*lst)->outfile)
-			close((*lst)->outfile);
-		temp = temp->next;
-		free(*lst);
-		*lst = temp;
-	}
+	size_of_argv = 0;
+	while (argv[size_of_argv])
+		size_of_argv++;
+	return (size_of_argv);
 }
 
 char	**ft_strstrdup(char *str)

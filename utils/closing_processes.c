@@ -1,6 +1,13 @@
-#include "pipex_bonus.h"
 
-void close_first_process(int **fds, int current_process)
+#include "includes/pipex.h"
+
+void closes(int fd1, int fd2)
+{
+	close(fd1);
+	close(fd2);
+}
+
+void close_first_process(int **fds, int total_args)
 {
 	int i;
 	int j;
@@ -16,7 +23,7 @@ void close_first_process(int **fds, int current_process)
 	}
 }
 
-void close_middle_process(int **fds, int current_process)
+void close_middle_process(int **fds, int current_process, int total_args)
 {
 	int i;
 	int j;
@@ -45,7 +52,7 @@ void close_middle_process(int **fds, int current_process)
 	}
 }
 
-void close_last_process(int **fds, int current_process)
+void close_last_process(int **fds, int current_process, int total_args)
 {
 	int i;
 	int j;
@@ -68,12 +75,12 @@ void close_last_process(int **fds, int current_process)
 	}
 }
 
-void tree_of_closing(int **fds, int current_process)
+void tree_of_closing(int **fds, int current_process, int total_args)
 {
 	if (current_process == 0)
-		close_first_process(fds, current_process);
+		close_first_process(fds, total_args);
 	else if (current_process != 0 && current_process < (total_args - 1))
-		close_middle_process(fds, current_process);
+		close_middle_process(fds, current_process, total_args);
 	else if (current_process != 0 && current_process == (total_args - 1))
-		close_last_process(fds, current_process);
+		close_last_process(fds, current_process, total_args);
 }

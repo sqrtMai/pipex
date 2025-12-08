@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   list_related.c                                     :+:      :+:    :+:   */
+/*   init_list.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mai <mai@student.42.fr>                    +#+  +:+       +#+        */
+/*   By: bbouarab <bbouarab@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/07 08:23:46 by bbouarab          #+#    #+#             */
-/*   Updated: 2025/12/07 17:13:55 by mai              ###   ########.fr       */
+/*   Updated: 2025/12/08 15:29:01 by bbouarab         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,34 +26,23 @@ t_list	*init_nodes(int total_args)
 	new_list->infile = 100;
 	new_list->outfile = 100;
 	new_list->absolute = 0;
-	new_list->index = 2;
+	new_list->i = 2;
 	new_list->total_args = total_args;
 	new_list->next = NULL;
 	new_list->previous = NULL;
 	return (new_list);
 }
 
-void	init_infile(t_list *lst, char *infile)
+t_list	*ft_lstlast(t_list *lst)
 {
-	lst->infile = open(infile, O_RDONLY);
+	t_list	*temp;
 
-	if ((access(infile, R_OK) < 0 && access(infile, F_OK) == 0))
-		return (free_list(&lst),
-			ft_printf("%s: Permission denied\n", infile), exit(1));
-	if (lst->infile < 0)
-		return (free_list(&lst),
-			ft_printf("%s: no such file or directory\n", infile), exit(127));
-}
-
-void	init_outfile(t_list *lst, char *outfile)
-{
-	lst->outfile = open(outfile, O_WRONLY | O_TRUNC | O_CREAT, 0644);
-	if (access(outfile, W_OK) < 0 && access(outfile, F_OK) == 0)
-		return (free_list(&lst),
-			ft_printf("%s: Permission denied\n", outfile), exit(1));
-	if (lst->outfile < 0)
-		return (free_list(&lst),
-			ft_printf("%s: a problem has occured with opening outfile\n", outfile), exit(127));
+	if (!lst)
+		return (lst);
+	temp = lst;
+	while (temp->next != NULL)
+		temp = temp->next;
+	return (temp);
 }
 
 void create_list(t_list **lst, int cmd_total)
@@ -71,22 +60,11 @@ void create_list(t_list **lst, int cmd_total)
 		if (i == 1)
 			previous = *lst;
 		*lst = (*lst)->next;
-		//previous->next = (*lst);
 		(*lst)->previous = previous;
 		previous = previous->next;
 		i++;
 	}
 	*lst = head_ptr;
-}
-
-size_t argvlen(char **argv)
-{
-	size_t size_of_argv;
-
-	size_of_argv = 0;
-	while (argv[size_of_argv])
-		size_of_argv++;
-	return (size_of_argv);
 }
 
 void init_cmd(t_list *lst, char **argv, char **envp)
@@ -104,7 +82,7 @@ void init_cmd(t_list *lst, char **argv, char **envp)
 			lst->cmd = lst->args[lst->absolute++];
 		if (!lst->absolute)
 			lst->path = find_path(envp, lst->cmd);
-		lst->index = current_cmd;
+		lst->i = current_cmd;
 		if (current_cmd == 2)
 			init_infile(lst, argv[1]);
 		current_cmd++;

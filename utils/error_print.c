@@ -6,13 +6,13 @@
 /*   By: bbouarab <bbouarab@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/04 16:17:09 by bbouarab          #+#    #+#             */
-/*   Updated: 2025/12/04 16:24:31 by bbouarab         ###   ########.fr       */
+/*   Updated: 2025/12/08 14:29:08 by bbouarab         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "includes/pipex.h"
 
-void	command_not_found(char *cmd, char *argv)
+void	n_cmd(char *cmd, char *argv)
 {
 	char	*merge;
 	char	*merge2;
