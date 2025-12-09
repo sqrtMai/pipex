@@ -6,7 +6,7 @@
 /*   By: bbouarab <bbouarab@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/04 16:16:53 by bbouarab          #+#    #+#             */
-/*   Updated: 2025/12/08 15:23:24 by bbouarab         ###   ########.fr       */
+/*   Updated: 2025/12/09 10:15:31 by bbouarab         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -84,6 +84,7 @@ int	main(int argc, char **argv, char **envp)
 	lst = NULL;
 	total_args = argc - 3;
 	init_list(&lst, argv, envp, total_args);
+	total_args -= lst->here_doc;
 	fds = malloc_fds(total_args);
 	open_pipes(fds, total_args);
 	status = create_process(fds, lst, argv, envp);

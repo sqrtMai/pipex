@@ -6,11 +6,11 @@
 /*   By: bbouarab <bbouarab@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/04 16:17:09 by bbouarab          #+#    #+#             */
-/*   Updated: 2025/12/08 14:29:08 by bbouarab         ###   ########.fr       */
+/*   Updated: 2025/12/09 08:16:59 by bbouarab         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "includes/pipex.h"
+#include "../includes/pipex.h"
 
 void	n_cmd(char *cmd, char *argv)
 {

@@ -1,20 +1,37 @@
-
-#include "includes/pipex.h"
+#include "../includes/pipex.h"
 
 void first_process(t_list *lst, int **fds, char **argv, char **envp)
 {
 	char	*full_path;
+	int test;
 
 	if (lst->absolute == 0)
 		full_path = check_absolute_0(fds, lst, argv, fds[0][1]);
 	else
 		full_path = check_absolute_1(fds, lst, argv, fds[0][1]);
-	if (dup2(lst->infile, 0) < 0)
+	if (lst->here_doc == 0)
 	{
-		if (lst->absolute == 0 && full_path)
-			free(full_path);
-		return (close(fds[0][1]),
-		free_fd(fds, lst->total_args), free_list(&lst), exit(1));
+		if (dup2(lst->infile, 0) < 0)
+		{
+			if (lst->absolute == 0 && full_path)
+				free(full_path);
+			return (close(fds[0][1]),
+			free_fd(fds, lst->total_args), free_list(&lst), exit(1));
+		}
+	}
+	else
+	{
+		test = open("temp", O_RDWR | O_TRUNC | O_CREAT, 0644);
+		char *gnl = get_next_line(0);
+		while (!ft_strnstr(gnl, argv[2], strlen(argv[2])))
+		{
+			write(test, gnl, ft_strlen(gnl));
+			//write(test, "\n", 1);
+			free(gnl);
+			gnl = get_next_line(0);
+		}
+		dup2(test, 0);
+		//unlink("temp");
 	}
 	if (dup2(fds[0][1], 1) < 0)
 	{

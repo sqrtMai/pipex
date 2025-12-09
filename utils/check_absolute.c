@@ -1,4 +1,4 @@
-#include "includes/pipex.h"
+#include "../includes/pipex.h"
 
 char	*check_absolute_0(int **fds, t_list *lst, char **argv, int fd2)
 {

@@ -1,4 +1,4 @@
-#include "includes/pipex.h"
+#include "../includes/pipex.h"
 
 void	init_infile(t_list *lst, char *infile)
 {

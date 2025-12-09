@@ -6,11 +6,12 @@
 /*   By: bbouarab <bbouarab@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/07 08:23:46 by bbouarab          #+#    #+#             */
-/*   Updated: 2025/12/08 15:29:01 by bbouarab         ###   ########.fr       */
+/*   Updated: 2025/12/09 10:20:51 by bbouarab         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "includes/pipex.h"
+#include "../includes/pipex.h"
+
 
 t_list	*init_nodes(int total_args)
 {
@@ -27,6 +28,7 @@ t_list	*init_nodes(int total_args)
 	new_list->outfile = 100;
 	new_list->absolute = 0;
 	new_list->i = 2;
+	new_list->here_doc = 0;
 	new_list->total_args = total_args;
 	new_list->next = NULL;
 	new_list->previous = NULL;
@@ -75,7 +77,9 @@ void init_cmd(t_list *lst, char **argv, char **envp)
 	current_cmd = 2;
 	while (lst)
 	{
-		lst->args = ft_split(argv[current_cmd], ' ');
+		if (ft_strnstr(argv[1], "here_doc", 8))
+			lst->here_doc = 1;
+		lst->args = ft_split(argv[current_cmd + lst->here_doc], ' ');
 		if (!ft_strchr(lst->args[0], '/'))
 			lst->cmd = ft_strjoin(lst->slash, lst->args[0]);
 		else
@@ -83,7 +87,7 @@ void init_cmd(t_list *lst, char **argv, char **envp)
 		if (!lst->absolute)
 			lst->path = find_path(envp, lst->cmd);
 		lst->i = current_cmd;
-		if (current_cmd == 2)
+		if (current_cmd + lst->here_doc == 2)
 			init_infile(lst, argv[1]);
 		current_cmd++;
 		if (!lst->next)
@@ -95,6 +99,8 @@ void init_cmd(t_list *lst, char **argv, char **envp)
 
 void	init_list(t_list **lst, char **argv, char **envp, int cmd_total)
 {
+	if (ft_strnstr(argv[1], "here_doc", 8))
+		cmd_total -= 1;
 	create_list(lst, cmd_total);
 	init_cmd(*lst, argv, envp);
 }
