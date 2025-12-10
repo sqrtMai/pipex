@@ -23,6 +23,8 @@ $(NAME): $(OBJ)
 	cp get_next_line/libgnl.a $(NAME)
 	$(CC) $(CFLAGS) $(OBJ) -L./ft_printf -lftprintf -L./libft -lft  -L./get_next_line -lgnl -o $@
 
+bonus: all
+
 %.o: %.c $(HEADER)
 	$(CC) $(CFLAGS) -c $< -o $@
 
