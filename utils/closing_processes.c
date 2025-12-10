@@ -1,15 +1,27 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   closing_processes.c                                :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: bbouarab <bbouarab@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/12/10 14:29:46 by bbouarab          #+#    #+#             */
+/*   Updated: 2025/12/10 14:30:20 by bbouarab         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../includes/pipex.h"
 
-void closes(int fd1, int fd2)
+void	closes(int fd1, int fd2)
 {
 	close(fd1);
 	close(fd2);
 }
 
-void close_first_process(int **fds, int total_args)
+void	close_first_process(int **fds, int total_args)
 {
-	int i;
-	int j;
+	int	i;
+	int	j;
 
 	close(fds[0][0]);
 	i = 1;
@@ -22,13 +34,12 @@ void close_first_process(int **fds, int total_args)
 	}
 }
 
-void close_middle_process(int **fds, int current_process, int total_args)
+void	close_middle_process(int **fds, int current_process, int total_args)
 {
-	int i;
-	int j;
+	int	i;
+	int	j;
 
 	i = 0;
-
 	while (i <= total_args - 2)
 	{
 		j = 0;
@@ -51,10 +62,10 @@ void close_middle_process(int **fds, int current_process, int total_args)
 	}
 }
 
-void close_last_process(int **fds, int current_process, int total_args)
+void	close_last_process(int **fds, int current_process, int total_args)
 {
-	int i;
-	int j;
+	int	i;
+	int	j;
 
 	i = 0;
 	while (i <= total_args - 2)
@@ -74,7 +85,7 @@ void close_last_process(int **fds, int current_process, int total_args)
 	}
 }
 
-void tree_of_closing(int **fds, int current_process, int total_args)
+void	tree_of_closing(int **fds, int current_process, int total_args)
 {
 	if (current_process == 0)
 		close_first_process(fds, total_args);

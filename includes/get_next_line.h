@@ -6,7 +6,7 @@
 /*   By: bbouarab <bbouarab@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/04 14:58:23 by bbouarab          #+#    #+#             */
-/*   Updated: 2025/12/09 11:20:00 by bbouarab         ###   ########.fr       */
+/*   Updated: 2025/12/10 14:28:26 by bbouarab         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,6 +29,5 @@ char		*get_next_line(int fd);
 char		*get_next_char(int fd);
 char		*fill_line(int fd, char **stash);
 char		*ft_strjoin_gnl(char *s1, char *s2);
-
 
 #endif

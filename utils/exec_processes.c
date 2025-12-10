@@ -1,37 +1,31 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   exec_processes.c                                   :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: bbouarab <bbouarab@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/12/10 14:31:19 by bbouarab          #+#    #+#             */
+/*   Updated: 2025/12/10 14:32:07 by bbouarab         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../includes/pipex.h"
 
-void first_process(t_list *lst, int **fds, char **argv, char **envp)
+void	first_process(t_list *lst, int **fds, char **argv, char **envp)
 {
 	char	*full_path;
-	int test;
 
 	if (lst->absolute == 0)
 		full_path = check_absolute_0(fds, lst, argv, fds[0][1]);
 	else
 		full_path = check_absolute_1(fds, lst, argv, fds[0][1]);
-	if (lst->here_doc == 0)
+	if (dup2(lst->infile, 0) < 0)
 	{
-		if (dup2(lst->infile, 0) < 0)
-		{
-			if (lst->absolute == 0 && full_path)
-				free(full_path);
-			return (close(fds[0][1]),
-			free_fd(fds, lst->total_args), free_list(&lst), exit(1));
-		}
-	}
-	else
-	{
-		test = open("temp", O_RDWR | O_TRUNC | O_CREAT, 0644);
-		char *gnl = get_next_line(0);
-		while (!ft_strnstr(gnl, argv[2], strlen(argv[2])))
-		{
-			write(test, gnl, ft_strlen(gnl));
-			//write(test, "\n", 1);
-			free(gnl);
-			gnl = get_next_line(0);
-		}
-		dup2(test, 0);
-		//unlink("temp");
+		if (lst->absolute == 0 && full_path)
+			free(full_path);
+		return (close(fds[0][1]),
+		free_fd(fds, lst->total_args), free_list(&lst), exit(1));
 	}
 	if (dup2(fds[0][1], 1) < 0)
 	{
@@ -45,7 +39,7 @@ void first_process(t_list *lst, int **fds, char **argv, char **envp)
 		free_list(&lst), exit(1));
 }
 
-void middle_process(int **fds, t_list *lst, char **envp, char **argv)
+void	middle_process(int **fds, t_list *lst, char **envp, char **argv)
 {
 	char	*full_path;
 
@@ -99,23 +93,26 @@ void	last_process(int **fds, t_list *lst, char **envp, char **argv)
 		free_list(&lst), exit(1));
 }
 
-void tree_of_process(int **fds, t_list *lst, char **argv, char **envp)
+void	tree_of_process(int **fds, t_list *lst, char **argv, char **envp)
 {
-	int current_process;
+	int	current_process;
 
 	current_process = lst->i - 2;
-	if (current_process == 0)
+	if (current_process == 0 && lst->here_doc == 0)
 		first_process(lst, fds, argv, envp);
+	if (current_process == 0 && lst->here_doc == 1)
+		here_doc(lst, fds, argv, envp);
 	else if (current_process > 0 && current_process < (lst->total_args - 1))
 		middle_process(fds, lst, envp, argv);
 	else if (current_process == (lst->total_args - 1))
 		last_process(fds, lst, envp, argv);
 }
-int create_process(int **fds, t_list *lst, char **argv, char **envp)
+
+int	create_process(int **fds, t_list *lst, char **argv, char **envp)
 {
-	int status;
-	int current_process;
-	t_list *first;
+	int		status;
+	int		current_process;
+	t_list	*first;
 
 	status = 0;
 	current_process = lst->i - 2;
@@ -137,5 +134,5 @@ int create_process(int **fds, t_list *lst, char **argv, char **envp)
 		waitpid(first->pid, &status, 0);
 		first = first->next;
 	}
-	return status;
+	return (status);
 }

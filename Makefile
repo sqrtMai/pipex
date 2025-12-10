@@ -5,7 +5,7 @@ AR = ar rcs
 RM = rm -f
 
 SRC = pipex.c \
-		utils/check_absolute.c utils/closing_processes.c utils/error_print.c utils/exec_processes.c utils/free_related.c utils/pipex_utils.c \
+		utils/check_absolute.c utils/closing_processes.c utils/error_print.c utils/exec_processes.c utils/free_related.c utils/pipex_utils.c utils/bonus_utils.c utils/ft_findstr.c \
 		lst_related/init_files.c lst_related/init_list.c
 OBJ = $(SRC:.c=.o)
 

@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   free_related.c                                     :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: bbouarab <bbouarab@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/12/10 14:32:23 by bbouarab          #+#    #+#             */
+/*   Updated: 2025/12/10 14:32:24 by bbouarab         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../includes/pipex.h"
 
 int	free_and_continue(char *s)
@@ -15,6 +27,17 @@ void	free_everything(void **vector)
 		free(vector[i++]);
 	if (vector)
 		free(vector);
+}
+
+void	free_fd(int **fds, int total_args)
+{
+	int	i;
+
+	i = 0;
+	while (i <= total_args - 2)
+		free(fds[i++]);
+	if (fds)
+		free(fds);
 }
 
 void	free_list(t_list **lst)

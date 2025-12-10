@@ -6,15 +6,15 @@
 /*   By: bbouarab <bbouarab@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/04 16:17:01 by bbouarab          #+#    #+#             */
-/*   Updated: 2025/12/09 08:09:24 by bbouarab         ###   ########.fr       */
+/*   Updated: 2025/12/10 14:32:52 by bbouarab         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/pipex.h"
 
-size_t argvlen(char **argv)
+size_t	argvlen(char **argv)
 {
-	size_t size_of_argv;
+	size_t	size_of_argv;
 
 	size_of_argv = 0;
 	while (argv[size_of_argv])
